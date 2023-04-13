@@ -10,9 +10,9 @@ class CLIP(tf.keras.Model):
   def __init__(self,embedding_size=1000):
     self.gpt=GPT2()
     self.resnet=ResNet50()
-    self.image_projection=tf.keras.layers.Dense(embedding_size)
-    self.text_projection=tf.keras.layers.Dense(embedding_size)
-    self.temperature=tf.Variable(shape=(1,))
+    self.image_projection=tf.keras.layers.Dense(embedding_size,use_bias=False)
+    self.text_projection=tf.keras.layers.Dense(embedding_size,use_bias=False)
+    self.temperature=tf.Variable(1.0)
     self.optimizer=tf.keras.optimizers.Adam()
   def getImageEmbedding(self,image_batch):
     image_outputs=ResNet50(image_batch)

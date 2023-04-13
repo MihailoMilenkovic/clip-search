@@ -34,6 +34,15 @@ def preprocess_image(img,img_average=None):
   return img
 
 
+def byte_pair_encode_dataset():
+  #TODO: parse dataset using BPE with sentencepiece (https://github.com/google/sentencepiece) and store labels
+  #TODO: store information such as vocab_size in metadata_dir
+  pass
+
+vocab_size=30
+def get_byte_pair_encoding(text):
+  #TODO: get stored byte pair encoding and encode text
+  return text
 
 def get_batch_annotated_images(batch_size=8):
   image_names=os.listdir(image_source_dir)
@@ -43,9 +52,10 @@ def get_batch_annotated_images(batch_size=8):
   for image_name in image_names_selected:
     image=Image.open(f"{image_dest_dir}/{image_name}")
     image_batch.append[image]
-    image_captions = coco_caps.getAnnIds(imgIds=image_name);
+    image_captions = coco_caps.getAnnIds(imgIds=image_name)
     if len(image_captions)>0:
       caption=image_captions[random.randint(0,len(image_captions)-1)]
+      caption=get_byte_pair_encoding(caption)
       caption_batch.append(caption)
   return image_batch,caption_batch
 

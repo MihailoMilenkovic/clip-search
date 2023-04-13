@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from gpt_model import GPT2
+from gpt_model import GPT2_small
 from resnet_model import ResNet50
 from preprocess import get_batch_annotated_images
 
@@ -8,19 +8,19 @@ model_path="models/CLIP"
 
 class CLIP(tf.keras.Model):
   def __init__(self,embedding_size=1000):
-    self.gpt=GPT2()
+    self.gpt=GPT2_small()
     self.resnet=ResNet50()
     self.image_projection=tf.keras.layers.Dense(embedding_size,use_bias=False)
     self.text_projection=tf.keras.layers.Dense(embedding_size,use_bias=False)
     self.temperature=tf.Variable(1.0)
     self.optimizer=tf.keras.optimizers.Adam()
   def getImageEmbedding(self,image_batch):
-    image_outputs=ResNet50(image_batch)
+    image_outputs=self.resnet(image_batch)
     image_projected=self.image_projection(image_outputs)
     image_normalized=tf.math.l2_normalize(image_projected)
     return image_normalized
   def getTextEmbedding(self,text_batch):
-    text_outputs=GPT2(text_batch)
+    text_outputs=self.gpt(text_batch)
     text_projected=self.text_projection(text_outputs)
     text_normalized=tf.math.l2_normalize(text_projected)
     return text_normalized

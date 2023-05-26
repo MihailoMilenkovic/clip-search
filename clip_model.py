@@ -59,6 +59,9 @@ class CLIP(tf.keras.Model):
         tf.keras.saving.save_model(self.model, f"{self.model_path}_{idx}")
 
     tf.keras.saving.save_model(self.model, self.model_path)
+  
+  def load_model(self):
+    self.model=tf.keras.saving.load_model(self.model_path)
           
 
 if __name__=="__main__":

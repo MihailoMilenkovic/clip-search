@@ -1,10 +1,9 @@
-from pycocotools.coco import COCO
-import numpy as np
 import os
-import cv2
 import tensorflow as tf
 import tensorflow.keras as keras
 from tensorflow.keras import layers
+from pycocotools.coco import COCO
+import numpy as np
 
 
 
@@ -17,7 +16,6 @@ coco = COCO(coco_annotations_file)
 
 # Get image IDs from COCO dataset
 image_ids = coco.getImgIds()
-
 image_preprocessor=keras.Sequential(
   [
       layers.Normalization(),

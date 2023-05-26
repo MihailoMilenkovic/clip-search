@@ -2,3 +2,6 @@ tensorflow
 tensorflow-hub
 pycocotools
 numpy
+dash
+flask
+pillow

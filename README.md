@@ -14,5 +14,6 @@ python train.py
 ## Running the server
 
 ```sh
-python server.py
+docker build -t clip-server .
+docker run -p 8050:8050 clip-server
 ```

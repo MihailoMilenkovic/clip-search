@@ -57,6 +57,7 @@ class CLIP(tf.keras.Model):
 
       if idx%5000==0:
         # TODO: evaluate CLIP score on subset of training data over time and calculate correlation coefficient with our model
+        # can be done using https://torchmetrics.readthedocs.io/en/stable/multimodal/clip_score.html
         # scores should be increasingly correlated over time
         # note: CLIP score is calculated as max(100*cos(e_i,e_c),0) where e_i and e_c are image and caption embeddings of our model
         tf.keras.saving.save_model(self.model, f"{self.model_path}_{idx}")

@@ -14,6 +14,7 @@ def index_labels():
 
 def get_most_similar_class(image_embedding):
   #TODO: see image_database.py, use same approach 
+  #test git
   pass
 
 def find_most_similar_class(user_image_input):

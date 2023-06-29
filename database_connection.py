@@ -2,7 +2,7 @@ from pymongo import MongoClient
 
 def connect():
     client = MongoClient('mongodb://nastava.is.pmf.uns.ac.rs:27017/')
-    db = client['databases']  # Zamijenite 'ime_baze' sa stvarnim imenom baze
+    db = client['databases']
 
     collection = db['imageEmbeddings']
 

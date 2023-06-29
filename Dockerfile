@@ -20,7 +20,6 @@ RUN python text_database.py
 COPY output_directory1 /app/output_directory1
 COPY output_directory2 /app/output_directory2
 
-
 # Expose the necessary port
 EXPOSE 8050
 

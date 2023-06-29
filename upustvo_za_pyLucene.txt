@@ -1,0 +1,24 @@
+# Koristite odgovarajuću verziju Pythona
+FROM python:3.9
+
+# Instalirajte alate i zavisnosti potrebne za PyLucene
+RUN apt-get update && apt-get install -y \
+    ant \
+    openjdk-8-jdk
+
+# Preuzmite PyLucene
+RUN curl -O https://www.apache.org/dist/lucene/pylucene/pylucene-X.Y.Z-src.tar.gz
+
+# Raspakujte PyLucene
+RUN tar -xvf pylucene-X.Y.Z-src.tar.gz && \
+    cd pylucene-X.Y.Z && \
+    python3 -m pip install .
+
+# Postavite radni direktorijum
+WORKDIR /app
+
+# Kopirajte vaš Python kod u kontejner
+COPY . /app
+
+# Pokrenite vaš Python fajl
+CMD [ "python", "your_script.py" ]

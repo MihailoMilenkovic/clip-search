@@ -48,16 +48,16 @@ class CLIP(tf.keras.Model):
     self.text_model_path="models/CLIP_text"
     self.image_model_path="models/CLIP_image"
 
-  def getImageEmbedding(self,image_batch):
+  def get_image_embedding(self,image_batch):
     return self.image_model(image_batch)
 
-  def getTextEmbedding(self,text_batch):
+  def get_text_embedding(self,text_batch):
     return self.text_model(text_batch)
 
   # @tf.function
   def train_batch(self,image_batch,text_batch):
-    image_emb=self.getImageEmbedding(image_batch)
-    text_emb=self.getTextEmbedding(text_batch)
+    image_emb=self.get_image_embedding(image_batch)
+    text_emb=self.get_text_embedding(text_batch)
     # print("image emb:",image_emb)
     # print("text emb:",text_emb)
     logits=tf.matmul(image_emb,text_emb,transpose_b=True)*tf.exp(self.temperature)
@@ -88,10 +88,10 @@ class CLIP(tf.keras.Model):
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
 
         #TODO: remove if training working over first couple of batches
-        if cnt%10==1:
+        if cnt%20==0:
           break
 
-        if cnt%1000==0:
+        if cnt%5000==0:
           # TODO: evaluate CLIP score on subset of training data over time and calculate correlation coefficient with our model
           # can be done using https://torchmetrics.readthedocs.io/en/stable/multimodal/clip_score.html
           # scores should be increasingly correlated over time

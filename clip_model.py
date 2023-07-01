@@ -58,16 +58,17 @@ class CLIP(tf.keras.Model):
   def train_batch(self,image_batch,text_batch):
     image_emb=self.getImageEmbedding(image_batch)
     text_emb=self.getTextEmbedding(text_batch)
-    print("image emb:",image_emb)
-    print("text emb:",text_emb)
+    # print("image emb:",image_emb)
+    # print("text emb:",text_emb)
     logits=tf.matmul(image_emb,text_emb,transpose_b=True)*tf.exp(self.temperature)
+    # print("logits:",logits)
     labels=tf.eye(self.batch_size)
     loss_img=tf.keras.losses.CategoricalCrossentropy(axis=0)(labels,logits)
     loss_text=tf.keras.losses.CategoricalCrossentropy(axis=1)(labels,logits)
     loss=(loss_img+loss_text)/2
     return loss
 
-  def get_random_captions(caption_batch):
+  def get_random_captions(self,caption_batch):
     return tf.constant(tf.gather(caption_batch, tf.cast(tf.random.uniform([1])*caption_batch.shape[1], tf.int32), axis=1))
 
   def train_loop(self,num_epochs=1):
@@ -78,14 +79,18 @@ class CLIP(tf.keras.Model):
       for (image_batch,caption_batch) in coco_dataset:
         cnt+=1
         #select 1 random caption from each example for current training iteration
-        text_batch=get_random_captions(caption_batch)
+        text_batch=self.get_random_captions(caption_batch)
         with tf.GradientTape() as tape:
           loss=self.train_batch(image_batch=image_batch,text_batch=text_batch) 
         wandb.log({"loss":loss.numpy()})
 
         grads = tape.gradient(loss, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        
+
+        #TODO: remove if training working over first couple of batches
+        if cnt%10==1:
+          break
+
         if cnt%1000==0:
           # TODO: evaluate CLIP score on subset of training data over time and calculate correlation coefficient with our model
           # can be done using https://torchmetrics.readthedocs.io/en/stable/multimodal/clip_score.html

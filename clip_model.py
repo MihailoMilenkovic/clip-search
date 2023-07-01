@@ -54,7 +54,7 @@ class CLIP(tf.keras.Model):
   def get_text_embedding(self,text_batch):
     return self.text_model(text_batch)
 
-  # @tf.function
+  @tf.function(reduce_retracing=True)
   def train_batch(self,image_batch,text_batch):
     image_emb=self.get_image_embedding(image_batch)
     text_emb=self.get_text_embedding(text_batch)
@@ -107,5 +107,6 @@ class CLIP(tf.keras.Model):
           
 
 if __name__=="__main__":
+  tf.config.experimental_run_functions_eagerly(True)  # Temporarily run eagerly for easier debugging
   model=CLIP()
   model.train_loop(num_epochs=1)

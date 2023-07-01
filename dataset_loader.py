@@ -38,9 +38,5 @@ def load_coco_dataset(split="train", batch_size=8, preprocessing_type="training"
   dataset=dataset.filter(lambda example: len(example["captions"]["text"])==5)
   preprocessing_func=preprocess_data_for_model if preprocessing_type=="training" else preprocess_data_for_indexing
   dataset=dataset.map(preprocessing_func, num_parallel_calls=tf.data.AUTOTUNE)
-  dataset=dataset.shuffle(1000).batch(batch_size)
+  dataset=dataset.shuffle(100).batch(batch_size)
   return dataset
-
-if __name__=="__main__":
-  data=load_coco_dataset()
-  print("loaded data")

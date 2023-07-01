@@ -7,6 +7,12 @@ import random
 
 from dataset_loader import load_coco_dataset
 
+class NormalizationLayer(tf.keras.layers.Layer):
+  def call(self, inputs):
+      norm = tf.norm(inputs, axis=-1, keepdims=True)
+      normalized_inputs = inputs / norm
+      return normalized_inputs
+
 class CLIP(tf.keras.Model):
   def __init__(self,embedding_size=150,temperature=1.0,learning_rate=0.001,batch_size=8):
     super().__init__()
@@ -14,12 +20,13 @@ class CLIP(tf.keras.Model):
     #using vision transformer as image encoder
     self.image_encoder=hub.KerasLayer("https://tfhub.dev/sayakpaul/vit_s16_fe/1", trainable=True)
 
-    self.image_projection=tf.keras.layers.Dense(embedding_size,use_bias=False,kernel_regularizer=regularizers.L2(1.0))
-    self.text_projection=tf.keras.layers.Dense(embedding_size,use_bias=False,kernel_regularizer=regularizers.L2(1.0))
+    self.image_projection=tf.keras.layers.Dense(embedding_size,use_bias=False)
+    self.text_projection=tf.keras.layers.Dense(embedding_size,use_bias=False)
 
     self.image_model=tf.keras.Sequential([
       self.image_encoder,
       self.image_projection,
+      NormalizationLayer()
     ])
 
     text_input = tf.keras.layers.Input(shape=(), dtype=tf.string)
@@ -32,7 +39,8 @@ class CLIP(tf.keras.Model):
     pooled_output=text_encoder(encoder_inputs)["pooled_output"]
     self.text_model= tf.keras.Sequential([
       tf.keras.Model(text_input, pooled_output),
-      self.text_projection
+      self.text_projection,
+      NormalizationLayer()
     ])
 
     self.temperature=tf.Variable(temperature)
@@ -50,6 +58,8 @@ class CLIP(tf.keras.Model):
   def train_batch(self,image_batch,text_batch):
     image_emb=self.getImageEmbedding(image_batch)
     text_emb=self.getTextEmbedding(text_batch)
+    print("image emb:",image_emb)
+    print("text emb:",text_emb)
     logits=tf.matmul(image_emb,text_emb,transpose_b=True)*tf.exp(self.temperature)
     labels=tf.eye(self.batch_size)
     loss_img=tf.keras.losses.CategoricalCrossentropy(axis=0)(labels,logits)
@@ -62,15 +72,13 @@ class CLIP(tf.keras.Model):
 
   def train_loop(self,num_epochs=1):
     coco_dataset=load_coco_dataset(split="train", batch_size=self.batch_size, preprocessing_type="training")
-    # TODO: include after debugging
-    # wandb.init()
+    wandb.init()
     cnt=0
     for epoch in range(num_epochs):
       for (image_batch,caption_batch) in coco_dataset:
         cnt+=1
         #select 1 random caption from each example for current training iteration
         text_batch=get_random_captions(caption_batch)
-        print("curr text batch:",text_batch)
         with tf.GradientTape() as tape:
           loss=self.train_batch(image_batch=image_batch,text_batch=text_batch) 
         wandb.log({"loss":loss.numpy()})
@@ -89,7 +97,8 @@ class CLIP(tf.keras.Model):
     tf.keras.saving.save_model(self.image_model, self.image_model_path)
   
   def load_model(self):
-    self.model=tf.keras.saving.load_model(self.model_path)
+    self.text_model=tf.keras.saving.load_model(self.text_model_path)
+    self.image_model=tf.keras.saving.load_model(self.image_model_path)
           
 
 if __name__=="__main__":

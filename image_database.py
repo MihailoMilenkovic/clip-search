@@ -69,6 +69,7 @@ def find_most_similar_image(user_text_input):
   text_embedding=clip_model.getTextEmbedding(user_text_input)
   #TODO: load everything from database properly done 
   image_collection = db.get_image_collection() #actually returns only image embeddings from database
+  #HERE TRY TO BUILD KD TREE FOR EFFICIENCY KNN
   result_image_name=get_most_similar_image(text_embedding, image_collection, 1)
   result_image_contents=result_image_name
   return result_image_contents

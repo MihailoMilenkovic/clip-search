@@ -5,9 +5,13 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
+from clip_model import CLIP
 
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server)
+
+clip_model=CLIP()
+clip_model.load_model()
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
@@ -90,21 +94,28 @@ def process_uploaded_image(content, filename):
     [Input('generate-image-button', 'n_clicks')],
     [State('text-input', 'value')]
 )
+
+def get_image_caption_pair(user_input_text):
+    input_embedding=clip_model.get_text_embedding(user_input_text)
+    print("embedding is:",input_embedding)
+    #TODO: (@Ivana) find image with nearest embedding from database and output it and its caption
+    response_image = Image.new('RGB', (200, 200), (255, 255, 255))
+    response_caption = "this is the caption of the image"
+    image_io = io.BytesIO()
+    response_image.save(image_io, 'PNG')
+    image_io.seek(0)
+    
+    return image_io,response_caption
+
 def generate_image(n_clicks, text):
-  #TODO: customize with searching CLIP embeddings
     if n_clicks > 0:
-        # Process the text and generate an image response
-        # Replace this with your own image generation code
-        response_image = Image.new('RGB', (200, 200), (255, 255, 255))
-        image_io = io.BytesIO()
-        response_image.save(image_io, 'PNG')
-        image_io.seek(0)
-        
+        image_io,caption=get_image_caption_pair(text)
         return html.Div([
             html.H3('Text Input:'),
             html.Div(text),
-            html.H4('Generated Image:'),
-            html.Img(src='data:image/png;base64,{}'.format(image_io.getvalue()), style={'height': '300px'})
+            html.H4('Retrieved Image:'),
+            html.Img(src=f'data:image/png;base64,{image_io.getvalue()}', style={'height': '300px'}),
+            html.Div("Image caption:",caption)
         ])
 
 if __name__ == '__main__':

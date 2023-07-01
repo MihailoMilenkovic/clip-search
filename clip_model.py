@@ -88,7 +88,7 @@ class CLIP(tf.keras.Model):
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
 
         #TODO: remove if training working over first couple of batches
-        if cnt%20==0:
+        if cnt%200==0:
           break
 
         if cnt%5000==0:
@@ -107,6 +107,6 @@ class CLIP(tf.keras.Model):
           
 
 if __name__=="__main__":
-  tf.config.experimental_run_functions_eagerly(True)  # Temporarily run eagerly for easier debugging
+  # tf.config.run_functions_eagerly(True)  # Temporarily run eagerly for easier debugging
   model=CLIP()
   model.train_loop(num_epochs=1)

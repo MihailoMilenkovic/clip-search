@@ -14,12 +14,12 @@ class NormalizationLayer(tf.keras.layers.Layer):
       return normalized_inputs
 
 class CLIP(tf.keras.Model):
-  def __init__(self,embedding_size=256,temperature=1.0,learning_rate=1e-4,batch_size=8):
+  def __init__(self,embedding_size=256,temperature=1.0,learning_rate=1e-5,batch_size=8):
     super().__init__()
     self.batch_size=batch_size
-    #using resnet as vision encoder
-    self.image_encoder=hub.KerasLayer("https://tfhub.dev/google/imagenet/resnet_v2_50/feature_vector/3", trainable=True)
 
+    # self.image_encoder=hub.KerasLayer("https://tfhub.dev/google/imagenet/resnet_v2_50/feature_vector/3", trainable=True)
+    self.image_encoder= hub.KerasLayer("https://tfhub.dev/google/tf2-preview/mobilenet_v2/feature_vector/4", output_shape=[1280],trainable=True)
     self.image_projection=tf.keras.layers.Dense(embedding_size,use_bias=False)
     self.text_projection=tf.keras.layers.Dense(embedding_size,use_bias=False)
 
@@ -34,9 +34,8 @@ class CLIP(tf.keras.Model):
     "https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3")
     encoder_inputs = text_preprocessor(text_input)
     #using small bert model because large one takes too much compute
-    text_encoder = hub.KerasLayer(
-    "https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-6_H-256_A-4",
-    trainable=True)
+    text_encoder = hub.KerasLayer("https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-10_H-128_A-2/2",trainable=True)
+    # text_encoder = hub.KerasLayer("https://tfhub.dev/tensorflow/small_bert/bert_en_uncased_L-6_H-256_A-4",trainable=True)
     pooled_output=text_encoder(encoder_inputs)["pooled_output"]
     self.text_model= tf.keras.Sequential([
       tf.keras.Model(text_input, pooled_output),

@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import numpy as np
+import bson
 
 def connect():
     client = MongoClient('mongodb://nastava.is.pmf.uns.ac.rs:27017/')
@@ -21,7 +22,7 @@ def insert_embedd(collection, image_id, image_name, real_image,
     image_doc = {
         "image_id": image_id,
         "image_name": image_name,
-        "real_image": real_image,
+        "real_image": bson.Binary(real_image), #storage real image as binary data
         "image_embedding": image_embedding,
         "caption_to_use": caption_to_use,
         "text_embedding":text_embedding,
@@ -31,8 +32,8 @@ def insert_embedd(collection, image_id, image_name, real_image,
     #print("Successfully saved!")
 
 def find_document_by_embedding(embedding):
-    query = {"image_embedding": embedding}
     collection = connect()
+    query = {"image_embedding": embedding}
     document = collection.find_one(query)
-    #only one document found and return
+    #only one document found and returned
     return document

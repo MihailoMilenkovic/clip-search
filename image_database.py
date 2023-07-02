@@ -5,6 +5,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics.pairwise import cosine_similarity
 from dataset_loader import load_coco_dataset
 from clip_model import CLIP
+import kd_tree 
 
 #TODO (@Ivana): finish everything below
 def index_images():

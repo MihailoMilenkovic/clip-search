@@ -1,7 +1,9 @@
 tensorflow
 tensorflow-hub
-pycocotools
+tensorflow-text
+tensorflow-datasets
 numpy
 dash
 flask
 pillow
+wandb

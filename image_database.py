@@ -33,18 +33,7 @@ def get_k_most_similar_images(text_embedding, image_embeddings, k):
     result = collection.find_one({'embedding': embeddings[index]})
     print(': {:.2f}, Document: {}'.format(distance, result))
     """
-  
-#maybe better version of implementing kNN
-def get_k_most_similar_images_sec(text_embedding, image_embeddings, k):
-    # Compute cosine similarity between text and every image in database
-    similarities = cosine_similarity(text_embedding[np.newaxis, :], image_embeddings)
-    # K nearest images:
-    nearest_indices = np.argsort(similarities[0])[::-1][:k] #find the closest embedding
-    image_doc = db.find_document_by_embedding(nearest_indices)
-    return image_doc #return image doc which contains the closest embedding
-
-  #TODO: query database for most similar image, use l2 distance for similarity
-  #TODO: also have function to return top k most similar images
+#kNN in polinomial time (compute distance between query and every existing image)
 def get_k_most_similar_images_L2(query_embedding, image_embeddings, k=5):
     computed_distances = []
     # Computed distances by Euclidian (L2) distance

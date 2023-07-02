@@ -1,31 +1,30 @@
 import numpy as np
 
 class KDNode:
-    def __init__(self, point, embedding, left=None, right=None):
-        self.point = point
+    def __init__(self,embedding, left=None, right=None):
         self.image_embedding = embedding
         self.left = left
         self.right = right
 
-def build_tree(points, embeddings, depth=0):
-    if not points:
+def build_tree(embeddings, depth=0):
+    if len(embeddings) == 0:
         return None
-    k = len(points[0])
+
+    k = len(embeddings[0])
     axis = depth % k
-    sorted_points = sorted(points, key=lambda x: x[axis])
-    sorted_embeddings = [embeddings[i] for i in sorted(range(len(points)), key=lambda x: points[x][axis])]
-    median = len(sorted_points) // 2
+
+    sorted_points = sorted(embeddings, key=lambda x: x[axis])
+    median_idx = len(embeddings) // 2
+    median = sorted_points[median_idx]
+
+    left_points = sorted_points[:median_idx]
+    right_points = sorted_points[median_idx + 1:]
 
     return KDNode(
-        point=sorted_points[median],
-        embedding=sorted_embeddings[median],
-        left=build_tree(sorted_points[:median], sorted_embeddings[:median], depth + 1),
-        right=build_tree(sorted_points[median + 1:], sorted_embeddings[median + 1:], depth + 1)
+        median,
+        build_tree(left_points, depth + 1),
+        build_tree(right_points, depth + 1)
     )
-
-#L2 norma za racunanje didtance
-def euclidian_distance(target, node_embedd):
-    return np.linalg.norm(target - node_embedd)
 
 #knn with KD-tree
 def k_nn(root, target, k):
@@ -58,3 +57,44 @@ def k_nn(root, target, k):
     nearest_neighbors = []
     traverse(root, target, k, depth=0, nearest_neighbors=nearest_neighbors)
     return nearest_neighbors
+
+#L2 norma za racunanje didtance
+def euclidian_distance(target, node_embedd):
+    return np.linalg.norm(target - node_embedd)
+
+def knn_algorithm(query_point, kdTree, k):
+    knn_array = knn_search(query_point, kdTree, k)
+    print(knn_array)
+
+def knn_search(query_point, kdtree, k):
+    k_nearest_neighbors = []
+
+    def search(node, depth=0):
+        nonlocal k_nearest_neighbors
+
+        if node is None:
+            return
+
+        axis = depth % len(query_point)
+        current_point = node.point
+        distance = euclidian_distance(query_point - current_point)
+
+        if len(k_nearest_neighbors) < k:
+            k_nearest_neighbors.append((current_point, distance))
+            k_nearest_neighbors = sorted(k_nearest_neighbors, key=lambda x: x[1])
+        else:
+            if distance < k_nearest_neighbors[-1][1]:
+                k_nearest_neighbors[-1] = (current_point, distance)
+                k_nearest_neighbors = sorted(k_nearest_neighbors, key=lambda x: x[1])
+
+        if query_point[axis] < current_point[axis]:
+            search(node.left, depth + 1)
+            if abs(query_point[axis] - current_point[axis]) < k_nearest_neighbors[-1][1]:
+                search(node.right, depth + 1)
+        else:
+            search(node.right, depth + 1)
+            if abs(query_point[axis] - current_point[axis]) < k_nearest_neighbors[-1][1]:
+                search(node.left, depth + 1)
+
+    search(kdtree)
+    return [neighbor for neighbor, _ in k_nearest_neighbors]

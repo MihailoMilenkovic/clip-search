@@ -5,7 +5,9 @@ The models trained are a vision transformer and a text transformer and training 
 For text inputs, the image with the most similar CLIP embedding from the dataset is returned.\
 For image inputs, the model finds the imagenet class label with the most similar CLIP embedding and returns it.
 
-## Training the model
+## Model training
+
+- To train the model on the coco-captions dataset, run the following:
 
 ```sh
 python train.py
@@ -13,7 +15,10 @@ python train.py
 
 ## Running the server
 
+- To index the database using the trained model and run the server, run the following:
+
 ```sh
+docker run --name mongodb -d mongo:latest
 docker build -t clip-server .
-docker run -p 8050:8050 clip-server
+docker -p 8050:8050 --link mongodb clip-server
 ```

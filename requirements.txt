@@ -7,3 +7,4 @@ dash
 flask
 pillow
 wandb
+pymongo

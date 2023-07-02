@@ -3,7 +3,9 @@ import numpy as np
 import bson
 
 def connect():
-    client = MongoClient('mongodb://nastava.is.pmf.uns.ac.rs:27017/')
+    # mongo_conn_str='mongodb://nastava.is.pmf.uns.ac.rs:27017/'
+    mongo_conn_str='mongodb://mongodb:27017/'
+    client = MongoClient(mongo_conn_str)
     db = client['databases']
     collection = db['imageDocuments']
     return collection

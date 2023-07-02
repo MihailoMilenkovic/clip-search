@@ -1,4 +1,3 @@
-from dataset_loader import image_preprocessor
 import database_connection as db
 import numpy as np
 from dataset_loader import load_coco_dataset
@@ -49,3 +48,6 @@ def find_most_similar_image(user_text_input):
   result_image_embedding=get_most_similar_image_cosine(query_embedding, kd_tree, k) #using cosine similarity
   image_doc = db.find_document_by_embedding(result_image_embedding) 
   return image_doc['real_image'], image_doc['caption_to_use']
+
+if __name__=="__main__":
+  index_images()

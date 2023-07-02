@@ -14,7 +14,7 @@ class NormalizationLayer(tf.keras.layers.Layer):
       return normalized_inputs
 
 class CLIP(tf.keras.Model):
-  def __init__(self,embedding_size=256,temperature=1.0,learning_rate=1e-5,batch_size=8):
+  def __init__(self,embedding_size=256,temperature=1.0,learning_rate=5*1e-4,batch_size=32):
     super().__init__()
     self.batch_size=batch_size
 
@@ -88,7 +88,7 @@ class CLIP(tf.keras.Model):
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
 
         #TODO: remove if training working over first couple of batches
-        if cnt%200==0:
+        if cnt%300==0:
           break
 
         if cnt%5000==0:

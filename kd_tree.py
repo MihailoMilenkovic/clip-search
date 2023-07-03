@@ -1,3 +1,5 @@
+import numpy as np
+import database_connection as db
 class KDNode:
     def __init__(self,embedding, left=None, right=None):
         self.image_embedding = embedding
@@ -38,3 +40,24 @@ def print_kd_tree(node, depth=0):
 
     print_kd_tree(node.left, depth + 1)
     print_kd_tree(node.right, depth + 1)
+
+# Serialize tree before insert in MongoDb
+def serialize_tree(root):
+    if root is None:
+        return None
+
+    return {
+        'image_embedding ': root.image_embedding.tolist(), # ndarray to list before storing in MongoDB
+        'left': serialize_tree(root.left),
+        'right': serialize_tree(root.right)
+    }
+
+def deserialize_tree():
+    tree_doc = db.connect('imageKDTree').find_one()
+    if tree_doc is None:
+        return None
+    embedding = tree_doc['image_embedding']
+    left = deserialize_tree(tree_doc['left'])
+    right = deserialize_tree(tree_doc['right'])
+
+    return KDNode(np.array(embedding), left, right) #from list embedding to ndarray

@@ -24,5 +24,5 @@ python index_image_database.py
 
 ```sh
 docker build -t clip-server .
-docker -p 8050:8050 clip-server
+docker run -p 8050:8050 clip-server
 ```

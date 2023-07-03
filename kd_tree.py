@@ -13,7 +13,6 @@ def build_tree(embeddings, depth=0):
 
     k = len(embeddings[0])
     axis = depth % k
-
     sorted_points = sorted(embeddings, key=lambda x: x[axis])
     median_idx = len(embeddings) // 2
     median = sorted_points[median_idx]
@@ -47,13 +46,12 @@ def serialize_tree(root):
         return None
 
     return {
-        'image_embedding ': root.image_embedding.tolist(), # ndarray to list before storing in MongoDB
+        'image_embedding': root.image_embedding.tolist(), # ndarray to list before storing in MongoDB
         'left': serialize_tree(root.left),
         'right': serialize_tree(root.right)
     }
 
-def deserialize_tree():
-    tree_doc = db.connect('imageKDTree').find_one()
+def deserialize_tree(tree_doc):
     if tree_doc is None:
         return None
     embedding = tree_doc['image_embedding']

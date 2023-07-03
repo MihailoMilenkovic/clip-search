@@ -1,3 +1,4 @@
+import tensorflow as tf
 from pymongo import MongoClient
 import numpy as np
 import bson
@@ -15,20 +16,27 @@ def get_image_collection():
     image_embeddings = []
     for image in images:
         embedding = image['image_embedding']
-        image_embeddings.append(np.array(embedding))
+        image_embeddings.append(np.array(embedding)[0])
     #image_embeddings = np.array(image_embeddings)
-    return image_embeddings
+    return np.array(image_embeddings)
 
 def insert_embedd(collection, image_id, image_name, real_image, 
                   image_embedding, caption_to_use, text_embedding):
+                  
+    image_id_to_save=int(image_id[0].numpy())
+    image_name_to_save=str(image_name[0].numpy())
+    caption_to_save=str(caption_to_use[0][0].numpy())
+    image_embedding_to_save=image_embedding.numpy().tolist()
+    image_to_save=bson.Binary(real_image)
+    text_embedding_to_save=text_embedding.numpy().tolist()
+    print("saving data:------------------")
     image_doc = {
-        "image_id": image_id,
-        "image_name": image_name,
-        "real_image": bson.Binary(real_image), #storage real image as binary data
-        "image_embedding": image_embedding.numpy().tolist(), #from tensor to ndarray and to list embedding 
-        "caption_to_use": caption_to_use,
-        "text_embedding":text_embedding.numpy().tolist(), #from tensor to ndarray  and to list embedding
-
+        "image_id": image_id_to_save,
+        "image_name": image_name_to_save,
+        "real_image":image_to_save , #storage real image as binary data
+        "image_embedding": image_embedding_to_save, #from tensor to ndarray and to list embedding 
+        "caption_to_use": caption_to_save,
+        "text_embedding": text_embedding_to_save, #from tensor to ndarray  and to list embedding
     }
     collection.insert_one(image_doc)
     #print("Successfully saved!")

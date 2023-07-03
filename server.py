@@ -5,15 +5,16 @@ import dash
 from dash import html
 from dash import  dcc
 from dash.dependencies import Input, Output, State
+import base64
+from PIL import Image
 from clip_model import CLIP
 import index_image_database as img_db
 import kd_tree as kd
-import base64
-from PIL import Image
+import database_connection as db
 
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server)
-kd_tree = kd.deserialize_tree()
+kd_tree = kd.deserialize_tree(db.connect('imageKDTree').find_one())
 
 # clip_model=CLIP()
 # clip_model.load_model()
@@ -22,9 +23,12 @@ def get_image_caption_pair(user_input_text):
     # input_embedding=clip_model.get_text_embedding(user_input_text)
     # print("embedding is:",input_embedding)
     #TODO:(DONE) (@Ivana) find image with nearest embedding from database and output it and its caption
+    print("getting stuff")
     results = img_db.find_most_similar_image(user_input_text, kd_tree)
     response_image = results[0] #response image is currently in binary format
     response_caption = results[1]
+    print("response image",response_image)
+    print("response caption",response_caption)
      # Convert the image to base64 string
     image_data = Image.open(io.BytesIO(response_image))
     response_image.save(image_data, format='PNG')
@@ -79,4 +83,5 @@ def generate_image(n_clicks, text):
 
 
 if __name__ == '__main__':
-    app.run_server(host="0.0.0.0",port=8050, debug=True)
+    host="0.0.0.0"
+    app.run_server(port=8050, debug=True)

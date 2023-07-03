@@ -17,7 +17,6 @@ def index_images():
       caption_to_use=model.get_random_captions(captions)
       text_embedding=model.get_text_embedding(caption_to_use)
       image_embedding=model.get_image_embedding(train_image)
-      #print("saving data:",real_image,image_embedding,caption_to_use,text_embedding,image_filename,image_id)
       # saved to MongoDB database (fakultetska baza)
       db.insert_embedd(collection, image_id, image_filename, real_image, image_embedding, caption_to_use, text_embedding)
   collection_kd_tree = db.connect('imageKDTree')
@@ -42,12 +41,16 @@ def get_most_similar_image_cosine(query_embedding, kd_tree, k):
 
 def find_most_similar_image(user_text_input, kd_tree):
   clip_model=CLIP()
-  clip_model.load_model("models/CLIP")
+  print("okay1")
+  clip_model.load_model()
+  print("okay2")
   query_embedding=clip_model.getTextEmbedding(user_text_input)
   k = 1 #hyperparameter for kNN
   #result_image_embedding=get_most_similar_image_L2(query_embedding, kd_tree, k) #using Euclidian distance
+  print("okay3")
   result_image_embedding=get_most_similar_image_cosine(query_embedding.numpy(), kd_tree, k) #using cosine similarity
   image_doc = db.find_document_by_embedding(result_image_embedding) 
+  print("okay4")
   return image_doc['real_image'], image_doc['caption_to_use']
 
 if __name__=="__main__":

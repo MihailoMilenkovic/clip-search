@@ -29,7 +29,7 @@ def get_image_caption_pair(user_input_text):
     response_caption = results[1]
      # Convert the image to base64 string
     image_data = Image.open(io.BytesIO(response_image))
-    response_image.save(image_data, format='jpeg')
+    response_image.save(image_data, format='PNG')
     image_data.seek(0)
     image_base64 = base64.b64encode(image_data.getvalue()).decode('utf-8')
     

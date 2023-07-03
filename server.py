@@ -20,20 +20,7 @@ kd_tree = kd.deserialize_tree(db.connect('imageKDTree').find_one())
 # clip_model.load_model()
 
 def get_image_caption_pair(user_input_text):
-    # input_embedding=clip_model.get_text_embedding(user_input_text)
-    # print("embedding is:",input_embedding)
-    #TODO:(DONE) (@Ivana) find image with nearest embedding from database and output it and its caption
-    print("getting stuff")
-    results = img_db.find_most_similar_image(user_input_text, kd_tree)
-    response_image = results[0] #response image is currently in binary format
-    response_caption = results[1]
-     # Convert the image to base64 string
-    image_data = Image.open(io.BytesIO(response_image))
-    response_image.save(image_data, format='PNG')
-    image_data.seek(0)
-    image_base64 = base64.b64encode(image_data.getvalue()).decode('utf-8')
-    
-    return image_base64 ,response_caption
+    return img_db.find_most_similar_image(user_input_text, kd_tree)
 
 app.layout = html.Div(
     children=[

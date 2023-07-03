@@ -18,7 +18,11 @@ python train.py
 - To index the database using the trained model and run the server, run the following:
 
 ```sh
-docker run --name mongodb -d mongo:latest
+docker run -d -p 27017:27017 --name m1 mongo
+python index_image_database.py
+```
+
+```sh
 docker build -t clip-server .
-docker -p 8050:8050 --link mongodb clip-server
+docker -p 8050:8050 clip-server
 ```

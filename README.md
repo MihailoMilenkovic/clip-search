@@ -10,7 +10,8 @@ For image inputs, the model finds the imagenet class label with the most similar
 - To train the model on the coco-captions dataset, run the following:
 
 ```sh
-python train.py
+pip install -r requirements.txt
+python clip_model.py
 ```
 
 ## Running the server
@@ -18,11 +19,11 @@ python train.py
 - To index the database using the trained model and run the server, run the following:
 
 ```sh
-docker run -d -p 27017:27017 --name m1 mongo
+docker network create clip-network
+docker run -d -p 27017:27017 --network clip-network --name m1 mongo
 python index_image_database.py
 ```
 
 ```sh
-docker build -t clip-server .
-docker run -p 8050:8050 clip-server
+docker build -t clip-server . && docker run -p 8050:8050 --network clip-network clip-server
 ```

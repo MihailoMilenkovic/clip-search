@@ -5,7 +5,7 @@ import bson
 
 def connect(col_name):
     # mongo_conn_str='mongodb://nastava.is.pmf.uns.ac.rs:27017/'
-    mongo_conn_str='mongodb://localhost:27017/'
+    mongo_conn_str='mongodb://m1:27017/'
     client = MongoClient(mongo_conn_str)
     db = client['databases']
     collection = db[col_name]
@@ -27,7 +27,9 @@ def insert_embedd(collection, image_id, image_name, real_image,
     image_name_to_save=str(image_name[0].numpy())
     caption_to_save=str(caption_to_use[0][0].numpy())
     image_embedding_to_save=image_embedding.numpy().tolist()
-    image_to_save=bson.Binary(real_image)
+    image_bytes = tf.io.encode_image(real_image, format='jpeg')
+    image_binary_data = image_bytes.numpy()
+    image_to_save=bson.Binary(image_binary_data)
     text_embedding_to_save=text_embedding.numpy().tolist()
     print("saving data:------------------")
     image_doc = {

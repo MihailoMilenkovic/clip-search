@@ -4,6 +4,7 @@ from dataset_loader import load_coco_dataset
 from clip_model import CLIP
 import kd_tree as kd
 import knn_impl as knn
+import tensorflow as tf
 
 #TODO (@Ivana): finish everything below
 def index_images():
@@ -41,16 +42,12 @@ def get_most_similar_image_cosine(query_embedding, kd_tree, k):
 
 def find_most_similar_image(user_text_input, kd_tree):
   clip_model=CLIP()
-  print("okay1")
   clip_model.load_model()
-  print("okay2")
-  query_embedding=clip_model.getTextEmbedding(user_text_input)
+  query_embedding=clip_model.get_text_embedding(tf.constant([user_text_input]))
   k = 1 #hyperparameter for kNN
   #result_image_embedding=get_most_similar_image_L2(query_embedding, kd_tree, k) #using Euclidian distance
-  print("okay3")
   result_image_embedding=get_most_similar_image_cosine(query_embedding.numpy(), kd_tree, k) #using cosine similarity
   image_doc = db.find_document_by_embedding(result_image_embedding) 
-  print("okay4")
   return image_doc['real_image'], image_doc['caption_to_use']
 
 if __name__=="__main__":

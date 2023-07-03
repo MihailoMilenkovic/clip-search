@@ -8,7 +8,7 @@ def index_labels():
   labels=["label_1","label_2"]
   label_embeddings_csv=open("image_embeddings.csv","w")
   for (image_name,image_conents) in labels:
-    image_embedding=clip_model.getImageEmbedding(image_conents)
+    image_embedding=clip_model.get_image_embedding(image_conents)
     #TODO: save contents to database properly, see example in image_database.py
     label_embeddings_csv.write(f"{image_name},{image_embedding}\n")
 
@@ -20,7 +20,7 @@ def get_most_similar_class(image_embedding):
 def find_most_similar_class(user_image_input):
   clip_model=CLIP()
   clip_model.load_model("models/CLIP")
-  text_embedding=clip_model.getTextEmbedding(user_image_input)
+  text_embedding=clip_model.get_text_embedding(user_image_input)
   result_label=get_most_similar_class(text_embedding)
   return result_label
 

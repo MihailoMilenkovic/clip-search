@@ -27,11 +27,9 @@ def get_image_caption_pair(user_input_text):
     results = img_db.find_most_similar_image(user_input_text, kd_tree)
     response_image = results[0] #response image is currently in binary format
     response_caption = results[1]
-    print("response image",response_image)
-    print("response caption",response_caption)
      # Convert the image to base64 string
     image_data = Image.open(io.BytesIO(response_image))
-    response_image.save(image_data, format='PNG')
+    response_image.save(image_data, format='jpeg')
     image_data.seek(0)
     image_base64 = base64.b64encode(image_data.getvalue()).decode('utf-8')
     
@@ -83,5 +81,5 @@ def generate_image(n_clicks, text):
 
 
 if __name__ == '__main__':
-    host="0.0.0.0"
-    app.run_server(port=8050, debug=True)
+    # host="0.0.0.0"
+    app.run_server(host="0.0.0.0",port=8050, debug=True)

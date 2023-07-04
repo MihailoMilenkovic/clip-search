@@ -5,6 +5,9 @@ from clip_model import CLIP
 import kd_tree as kd
 import knn_impl as knn
 import tensorflow as tf
+from PIL import Image
+import bson
+import io
 
 #TODO (@Ivana): finish everything below
 def index_images():
@@ -48,10 +51,7 @@ def find_most_similar_image(user_text_input, kd_tree):
   #result_image_embedding=get_most_similar_image_L2(query_embedding, kd_tree, k) #using Euclidian distance
   result_image_embedding=get_most_similar_image_cosine(query_embedding.numpy(), kd_tree, k) #using cosine similarity
   image_doc = db.find_document_by_embedding(result_image_embedding) 
-  image=bson.Binary(image_doc['real_image'])
-  deserialized_vector = tf.io.parse_tensor(vector_data, out_type=tf.float32)
-  vector_png_repr=tf.io.encode_png(deserialized_vector)
-  return vector_png_repr, image_doc['caption_to_use']
-
+  return image_doc['real_image'], image_doc['caption_to_use'][2:-1]
+  
 if __name__=="__main__":
   index_images()

@@ -20,8 +20,9 @@ python clip_model.py
 
 ```sh
 docker network create clip-network
+#make sure conn str is 'mongodb://localhost:27017/' if running without docker and 'mongodb://m1:27017/' otherwise
 docker run -d -p 27017:27017 --network clip-network --name m1 mongo
-python index_image_database.py
+export MONGO_CONN_STR="mongodb://localhost:27017/"&&python index_image_database.py
 ```
 
 ```sh

@@ -2,10 +2,12 @@ import tensorflow as tf
 from pymongo import MongoClient
 import numpy as np
 import bson
+import os
+import base64
 
 def connect(col_name):
     # mongo_conn_str='mongodb://nastava.is.pmf.uns.ac.rs:27017/'
-    mongo_conn_str='mongodb://m1:27017/'
+    mongo_conn_str=os.environ["MONGO_CONN_STR"]
     client = MongoClient(mongo_conn_str)
     db = client['databases']
     collection = db[col_name]
@@ -27,14 +29,13 @@ def insert_embedd(collection, image_id, image_name, real_image,
     image_name_to_save=str(image_name[0].numpy())
     caption_to_save=str(caption_to_use[0][0].numpy())
     image_embedding_to_save=image_embedding.numpy().tolist()
-    image_bytes = tf.io.serialize_tensor(real_image[0])
-    image_to_save = image_bytes.numpy().tobytes()
+    image_to_save = base64.b64encode(tf.io.encode_png(real_image[0].numpy()).numpy()).decode('utf-8')
     text_embedding_to_save=text_embedding.numpy().tolist()
     print("saving data:------------------")
     image_doc = {
         "image_id": image_id_to_save,
         "image_name": image_name_to_save,
-        "real_image":image_to_save , #storage real image as binary data
+        "real_image":image_to_save, #storage real image as binary data
         "image_embedding": image_embedding_to_save, #from tensor to ndarray and to list embedding 
         "caption_to_use": caption_to_save,
         "text_embedding": text_embedding_to_save, #from tensor to ndarray  and to list embedding
